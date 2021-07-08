@@ -129,9 +129,8 @@ public class GrafoTests {
 		assertEquals(7, salidaMst.getCosto(), 0.1);
 	}
 	
-	
 	@Test
-	public void DFS() {
+	public void Kruskal() {
 		List<Integer> nums = new ArrayList<Integer>();
 		nums.add(0);
 		nums.add(1);
@@ -152,7 +151,54 @@ public class GrafoTests {
 		tuplaList.add(tupla5);
 		
 		GrafoDirigido<Integer> grafo = new GrafoDirigido<Integer>(nums, tuplaList);
+		Mst<Integer> salidaMst = grafo.kruskal();
+		
+		System.out.println("Kruskal, costo minimo: ");
+		System.out.println(salidaMst.getCosto());
+		
+		for (double[] fila : salidaMst.getGrafo().getM()) {
+			for (double elem : fila) {
+				System.out.printf("%8.2f ", elem);	
+				System.out.print("  ");
+			}
+			System.out.println();
+		}
+		
+		System.out.printf("%s%s%s%s", '\n', '\n', '\n', '\n');
+		
+		assertEquals(7, salidaMst.getCosto(), 0.1);
+	}
+	
+	
+	@Test
+	public void DFS_BFS() {
+		List<Integer> nums = new ArrayList<Integer>();
+		nums.add(0);
+		nums.add(1);
+		nums.add(2);
+		nums.add(3);
+		
+		List<Tupla<Integer>> tuplaList = new ArrayList<Tupla<Integer>>();
+		Tupla<Integer> tupla1 = new Tupla<Integer>(0, 1, 1);
+		Tupla<Integer> tupla2 = new Tupla<Integer>(0, 3, 5);
+		Tupla<Integer> tupla3 = new Tupla<Integer>(1, 2, 4);
+		Tupla<Integer> tupla4 = new Tupla<Integer>(1, 3, 5);
+		Tupla<Integer> tupla5 = new Tupla<Integer>(2, 3, 2);
+		
+		tuplaList.add(tupla1);
+		tuplaList.add(tupla2);
+		tuplaList.add(tupla3);
+		tuplaList.add(tupla4);
+		tuplaList.add(tupla5);
+		
+		GrafoDirigido<Integer> grafo = new GrafoDirigido<Integer>(nums, tuplaList);
+		System.out.println("DFS: ");
 		grafo.DFS(0);
+		System.out.println();
+		System.out.println("BFS: ");
+		grafo.BFS(0);
+		
+		System.out.printf("%s%s%s%s", '\n', '\n', '\n', '\n');
 	}
 	
 	

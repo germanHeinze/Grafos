@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Stack;
 
@@ -11,11 +12,11 @@ public class GrafoDirigido<T> {
 
 	private double[][] m;
 	private List<T> vertices;
-	private List<Tupla<T>> mCostosMin;
+	private List<Tupla<T>> aristas;
 
 	public GrafoDirigido(List<T> vertices, List<Tupla<T>> aristas) {
 		this.vertices = vertices;
-		this.mCostosMin = aristas;
+		this.aristas = aristas;
 		this.m = new double[vertices.size()][vertices.size()];
 
 		// Llena la matriz de INFINITOS
@@ -38,7 +39,7 @@ public class GrafoDirigido<T> {
 
 	public GrafoDirigido(List<T> vertices) {
 		this.vertices = vertices;
-		this.mCostosMin = new ArrayList<Tupla<T>>();
+		this.aristas = new ArrayList<Tupla<T>>();
 		this.m = new double[vertices.size()][vertices.size()];
 
 		// Llena la matriz de INFINITOS
@@ -103,7 +104,7 @@ public class GrafoDirigido<T> {
 
 		if (sal) {
 			this.m[this.vertices.indexOf(vertice1)][this.vertices.indexOf(vertice2)] = tupla.getPeso();
-			this.mCostosMin.add(tupla);
+			this.aristas.add(tupla);
 		}
 
 		return sal;
@@ -188,33 +189,38 @@ public class GrafoDirigido<T> {
 		return new Mst<T>(grafoSal, cT);
 	}
 
-	// TODO
 	// Kruskal
 	public Mst<T> kruskal() {
-		Collections.sort(this.mCostosMin);
 		List<T> vMst = new ArrayList<T>();
-		GrafoDirigido<T> grafoSal = new GrafoDirigido<T>(this.vertices);
+		PriorityQueue<Tupla<T>> aristas = new PriorityQueue<Tupla<T>>(this.aristas);
 		double cT = 0;
+		GrafoDirigido<T> grafoSal = new GrafoDirigido<T>(this.vertices);
 
-		int cont = 0;
-		int indice = 0;
-		// Inicial
-		grafoSal.addCosto(this.mCostosMin.get(indice));
-		while (cont < this.vertices.size()) {
-			indice++;
-			T nodo1 = this.mCostosMin.get(indice).getNodo1();
-			T nodo2 = this.mCostosMin.get(indice).getNodo2();
-			double costo = this.mCostosMin.get(indice).getPeso();
+//		for (Tupla<T> arista : this.aristas) {
+//			aristas.add(arista);
+//		}
 
-			boolean nodo1Incluido = false;
-			boolean nodo2Incluido = false;
+		UnionFind unionFind = new UnionFind(this.size());
 
-			double[][] m = grafoSal.getM();
-			for (int i = 0; i < m.length; i++) {
-				if (m[grafoSal.getPosVertice(nodo1)][i] < Double.POSITIVE_INFINITY)
-					nodo1Incluido = true;
+		int i = 0;
+
+		while (i < this.size() - 1) {
+
+			Tupla<T> arista = aristas.remove();
+
+			int representanteOrigen = unionFind.find(this.getPosVertice(arista.getNodo1()));
+			int representanteDestino = unionFind.find(this.getPosVertice(arista.getNodo2()));
+
+			if (representanteOrigen != representanteDestino) {
+				i++;
+				unionFind.union(representanteOrigen, representanteDestino);
+//				Tupla<T> tupla = new Tupla<T>(null, null, representanteDestino);
+				grafoSal.addCosto(arista);
+				cT += arista.getPeso();
 			}
 		}
+
+//		matrizResultado.setCostoMinimo(costoMinimo);
 
 		return new Mst<T>(grafoSal, cT);
 	}
@@ -243,7 +249,7 @@ public class GrafoDirigido<T> {
 	}
 
 	// BFS - Breadth First Search
-	public void recorrer(T nodoInicial) {
+	public void BFS(T nodoInicial) {
 		boolean[] visitado = new boolean[this.vertices.size()];
 		Queue<T> cola = new LinkedList<T>();
 
@@ -277,8 +283,9 @@ public class GrafoDirigido<T> {
 		for (k = 0; k < this.size(); k++) {
 			for (i = 0; i < this.size(); i++) {
 				for (j = 0; j < this.size(); j++) {
-					
-					if (k != i && k != j && mCostosMin[i][k] != Double.POSITIVE_INFINITY && mCostosMin[k][j] != Double.POSITIVE_INFINITY) {
+
+					if (k != i && k != j && mCostosMin[i][k] != Double.POSITIVE_INFINITY
+							&& mCostosMin[k][j] != Double.POSITIVE_INFINITY) {
 						double dist = mCostosMin[i][k] + mCostosMin[k][j];
 						if (dist < mCostosMin[i][j])
 							mCostosMin[i][j] = dist;
@@ -308,7 +315,7 @@ public class GrafoDirigido<T> {
 		for (k = 0; k < this.size(); k++) {
 			for (i = 0; i < this.size(); i++) {
 				for (j = 0; j < this.size(); j++) {
-					
+
 					if (k != i && k != j && i != j)
 						mCaminos[i][j] = mCaminos[i][j] || (mCaminos[i][k] && mCaminos[k][j]);
 				}
