@@ -196,7 +196,12 @@ public class GrafoTests {
 		grafo.DFS(0);
 		System.out.println();
 		System.out.println("BFS: ");
-		grafo.BFS(0);
+		int[] distancias = grafo.BFS(0);
+		
+		System.out.println();
+		for (int dist : distancias) {
+			System.out.print(dist + " , ");
+		}
 		
 		System.out.printf("%s%s%s%s", '\n', '\n', '\n', '\n');
 	}

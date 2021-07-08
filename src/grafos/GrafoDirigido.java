@@ -115,6 +115,11 @@ public class GrafoDirigido<T> {
 		List<T> s = new ArrayList<T>();
 		List<T> vS = new ArrayList<T>();
 		double[] d = this.m[this.vertices.indexOf(verticeIni)];
+		List<T> p = new ArrayList<T>();
+		for (int i = 0; i < this.size() - 1; i++) {
+			p.add(verticeIni);
+		}
+		
 		double min = Double.MAX_VALUE;
 		double minAnterior = Double.MIN_VALUE;
 		int w = 0;
@@ -137,8 +142,12 @@ public class GrafoDirigido<T> {
 
 			// remplaza en vector d
 			for (int i = 0; i < d.length; i++) {
-				if (i != w && i != this.vertices.indexOf(verticeIni))
+				if (i != w && i != this.vertices.indexOf(verticeIni)) {
+					if (d[w] + this.m[w][i] < d[i])
+						p.set(i - 1, this.vertices.get(w));
+					
 					d[i] = Math.min(d[i], d[w] + this.m[w][i]);
+				}
 			}
 
 			minAnterior = min;
@@ -149,6 +158,7 @@ public class GrafoDirigido<T> {
 			vS.remove(this.vertices.get(w));
 		}
 
+		System.out.println("p: " + p);
 		return d;
 	}
 
@@ -236,7 +246,7 @@ public class GrafoDirigido<T> {
 
 		while (!pilaNodos.isEmpty()) {
 			T nodo = pilaNodos.pop();
-			System.out.print(nodo + " ");
+			System.out.print(nodo + " --> ");
 			for (T ady : this.getAdyacentes(nodo)) {
 				if (!nodosVisitados[getPosVertice(ady)]) {
 					pilaNodos.push(ady);
@@ -249,12 +259,17 @@ public class GrafoDirigido<T> {
 	}
 
 	// BFS - Breadth First Search
-	public void BFS(T nodoInicial) {
+	public int[] BFS(T nodoInicial) {
 		boolean[] visitado = new boolean[this.vertices.size()];
+		int[] distancias = new int[this.vertices.size()];
 		Queue<T> cola = new LinkedList<T>();
+		int dist = 0;
 
 		visitado[getPosVertice(nodoInicial)] = true;
+		distancias[getPosVertice(nodoInicial)] = dist;
+		dist++;
 		cola.add(nodoInicial);
+		System.out.print(nodoInicial + " --> ");
 
 		while (!cola.isEmpty()) {
 			T nodo = cola.poll();
@@ -262,12 +277,16 @@ public class GrafoDirigido<T> {
 				if (!visitado[getPosVertice(ady)]) {
 					cola.add(ady);
 					visitado[getPosVertice(ady)] = true;
+					distancias[getPosVertice(ady)] = dist;
 
-					System.out.print(ady + " ");
+					System.out.print(ady + " --> ");
 
 				}
 			}
+			dist++;
 		}
+		
+		return distancias;
 	}
 
 	// Floyd
